@@ -1,0 +1,25 @@
+menu "ZCode Badge 配置"
+
+    config ZCODE_WIFI_SSID
+        string "WiFi SSID (2.4G)"
+        default ""
+        help
+            工牌连接的 WiFi 名称。ESP32-C3 仅支持 2.4GHz。
+
+    config ZCODE_WIFI_PASS
+        string "WiFi 密码"
+        default ""
+
+    config ZCODE_GW_URL
+        string "网关地址"
+        default "http://your-gateway-host:8787"
+        help
+            ZCode 工牌网关 HTTP API 地址（gateway.py 部署处），形如 http://<主机>:8787。
+
+    config ZCODE_GW_TOKEN
+        string "网关令牌"
+        default ""
+        help
+            网关 gateway-config.json 中 token 字段；为空则不带 X-Gateway-Token 头。
+
+endmenu

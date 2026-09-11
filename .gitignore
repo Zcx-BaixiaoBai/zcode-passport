@@ -1,0 +1,22 @@
+build/
+sdkconfig
+sdkconfig.old
+managed_components/
+.vscode/
+.idea/
+.mimosa/
+
+# --- 网关运行期密钥/产物（真实值切勿提交；仅 *.example 模板入库）---
+gateway/link.txt
+gateway/gateway-config.json
+gateway/server-config.json
+gateway/asr.env
+gateway/*.log
+gateway/*.jsonl
+gateway/*.pcm
+gateway/__pycache__/
+gateway/ask-*.json
+gateway/*-test*.json
+gateway/hist_*.json
+gateway/prompt-test.json
+gateway/gw_smoke*.out

@@ -1,0 +1,12 @@
+{
+  "link_file": "link.txt",
+  "workspace": null,
+  "task": "auto",
+  "origin": "https://zcode.z.ai",
+  "bind": "127.0.0.1",
+  "port": 8787,
+  "token": "<your-gateway-token>",
+  "asr_env_file": "asr.env",
+  "tts_voice": "zh-CN-XiaoxiaoNeural",
+  "ask_timeout": 180
+}
