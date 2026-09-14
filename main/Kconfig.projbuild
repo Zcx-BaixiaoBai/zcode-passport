@@ -12,9 +12,10 @@ menu "ZCode Badge 配置"
 
     config ZCODE_GW_URL
         string "网关地址"
-        default "http://your-gateway-host:8787"
+        default ""
         help
             ZCode 工牌网关 HTTP API 地址（gateway.py 部署处），形如 http://<主机>:8787。
+            留空则运行期经 SoftAP 配网写入 NVS（发布构建请保持为空）。
 
     config ZCODE_GW_TOKEN
         string "网关令牌"

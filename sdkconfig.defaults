@@ -41,10 +41,9 @@ CONFIG_BT_NIMBLE_MAX_CONNECTIONS=1
 CONFIG_BT_NIMBLE_HOST_BASED_PRIVACY=n
 CONFIG_BT_NIMBLE_NVS_PERSIST=n
 
-# --- ZCode 工牌凭据（请填自己的；真实值切勿提交到公开仓库）---
-# 推荐用 idf.py menuconfig → "ZCode Badge 配置" 填写；WiFi 仅支持 2.4GHz。
-# GW_URL 形如 http://<你的网关主机>:8787（gateway.py 部署处）；TOKEN 见网关 gateway-config.json。
+# --- ZCode 工牌凭据：发布构建一律置空，运行期经 SoftAP 配网写入 NVS ---
+# 开发机如需免配网调试，可临时在此填值（勿提交）或 idf.py menuconfig。
 CONFIG_ZCODE_WIFI_SSID=""
 CONFIG_ZCODE_WIFI_PASS=""
-CONFIG_ZCODE_GW_URL="http://your-gateway-host:8787"
+CONFIG_ZCODE_GW_URL=""
 CONFIG_ZCODE_GW_TOKEN=""

@@ -15,6 +15,7 @@ void ui_init(void);
 
 void ui_set_header(const char *title);
 void ui_set_battery(int soc);              // -1 = 不可用
+void ui_set_mute(bool on);                 // 顶栏静音角标
 void ui_set_hint(const char *text);        // 底部按键提示
 
 void ui_set_busy(const char *msg);         // 全屏遮罩消息；NULL 关闭

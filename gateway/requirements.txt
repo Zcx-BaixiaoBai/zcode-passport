@@ -1,0 +1,6 @@
+# ZCode 工牌网关（gateway.py）运行依赖。
+# demo-gateway.py 仅用标准库即可运行；edge-tts/miniaudio 缺失时演示语音回落为提示音。
+websocket-client>=1.7   # 连 ZCode 远控中继（zcode_remote.py: import websocket）；缺它网关起得来但永远配不上对
+certifi                 # CA 证书包：Windows Server 可能缺系统 CA 链时用（zcode_remote.py 优先读它）
+miniaudio>=1.57         # ASR 24k→16k 重采样 + TTS MP3→WAV 解码
+edge-tts>=6.1.0         # TTS 语音合成（免密钥）

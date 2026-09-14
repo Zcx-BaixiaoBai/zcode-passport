@@ -19,7 +19,12 @@ static char s_token[64] = "";
 
 void gw_client_init(const char *base_url, const char *token)
 {
-    snprintf(s_base, sizeof(s_base), "%s", base_url);
+    // 容忍配网时漏填协议头：无 "://" 时自动补 http://（用户常只填 192.168.x.x:8788）
+    if (base_url && strncmp(base_url, "http://", 7) != 0 && strncmp(base_url, "https://", 8) != 0) {
+        snprintf(s_base, sizeof(s_base), "http://%s", base_url);
+    } else {
+        snprintf(s_base, sizeof(s_base), "%s", base_url ? base_url : "");
+    }
     // 去掉尾部 '/'
     size_t n = strlen(s_base);
     while (n && s_base[n - 1] == '/') s_base[--n] = '\0';

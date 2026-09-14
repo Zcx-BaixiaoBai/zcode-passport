@@ -35,7 +35,7 @@ LV_FONT_DECLARE(lv_font_ai_passport_14);
 #define VISIBLE_ROWS 5
 
 static lv_obj_t *s_scr;
-static lv_obj_t *s_hdr_title, *s_hdr_batt;
+static lv_obj_t *s_hdr_title, *s_hdr_batt, *s_hdr_mute;
 static lv_obj_t *s_body;                 // 当前内容容器（列表/详情），重建时销毁
 static lv_obj_t *s_hint;
 static lv_obj_t *s_busy;                 // 遮罩（NULL=无）
@@ -103,8 +103,11 @@ void ui_init(void)
     lv_obj_set_style_border_side(hdr, LV_BORDER_SIDE_BOTTOM, 0);
     s_hdr_title = mk_label(hdr, "ZCode 工牌", C_TEXT);
     lv_label_set_long_mode(s_hdr_title, LV_LABEL_LONG_DOT);
-    lv_obj_set_width(s_hdr_title, 170);
+    lv_obj_set_width(s_hdr_title, 140);
     lv_obj_align(s_hdr_title, LV_ALIGN_LEFT_MID, 12, 0);
+    s_hdr_mute = mk_label(hdr, "静音", C_WARN);
+    lv_obj_align(s_hdr_mute, LV_ALIGN_RIGHT_MID, -52, 0);
+    lv_obj_add_flag(s_hdr_mute, LV_OBJ_FLAG_HIDDEN);
     s_hdr_batt = mk_label(hdr, "--", C_SUB);
     lv_obj_align(s_hdr_batt, LV_ALIGN_RIGHT_MID, -12, 0);
 
@@ -147,6 +150,16 @@ void ui_set_battery(int soc)
     lock();
     lv_label_set_text(s_hdr_batt, buf);
     lv_obj_set_style_text_color(s_hdr_batt, lv_color_hex(col), 0);
+    unlock();
+}
+
+void ui_set_mute(bool on)
+{
+    lock();
+    if (s_hdr_mute) {
+        if (on) lv_obj_clear_flag(s_hdr_mute, LV_OBJ_FLAG_HIDDEN);
+        else lv_obj_add_flag(s_hdr_mute, LV_OBJ_FLAG_HIDDEN);
+    }
     unlock();
 }
 

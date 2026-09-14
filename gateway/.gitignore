@@ -1,0 +1,10 @@
+# 运行期文件：含配对链接 / 令牌 / 云密钥，绝不入库、绝不进公开仓库
+link.txt
+gateway-config.json
+asr.env
+server-config.json
+# 本地环境与缓存
+.venv/
+__pycache__/
+*.pycgateway.log
+*.log
