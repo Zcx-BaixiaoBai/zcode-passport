@@ -3,19 +3,22 @@
  * Size: 14 px
  * Bpp: 1
  * Source: Source Han Sans SC Normal 2.005 (SIL OFL 1.1)
- * Ranges: ASCII, general/CJK/full-width punctuation, arrows & enclosed alphanumerics
- *         & geometric shapes (U+2190-U+2193, U+00B7, U+2460-U+2469, U+25B6/U+25C0,
- *         U+2605/U+2606, U+26A0, U+2713 ...), U+4E00-U+9FFF
+ * Ranges: ASCII, general/CJK/full-width punctuation, arrows, enclosed alphanumerics,
+ *         geometric shapes & dingbats (U+00B7, U+2190-U+2193, U+2460-U+2469,
+ *         U+25B6/U+25C0, U+2605/U+2606, U+26A0, U+2713 ...), U+4E00-U+9FFF
  * Generated with lv_font_conv 1.5.3, 1 bpp, compressed, no kerning:
- *   npx lv_font_conv@1.5.3 --font SourceHanSansSC-Normal.otf --size 14 --bpp 1 \
+ *   npx lv_font_conv@1.5.3 --font SourceHanSansSC-Normal.otf --size 14 --bpp 1
  *       --format lvgl --no-kerning --lv-font-name lv_font_ai_passport_14 -r <ranges>
- * Charset: 21447 code points (21437 with real glyphs). 相对上一版补入 26 个符号
+ * 之后必须保留两处与本工程排版/构建相关的手工调整（lv_font_conv 不会生成）：
+ *   1. #include "lvgl.h"（本工程用 LV_CONF_INCLUDE_SIMPLE，非 "lvgl/lvgl.h"）
+ *   2. line_height = 17 / base_line = 4（匹配既有 14 px 产品排版，默认值 27/8 会撑坏布局）
+ * Charset: 21447 code points（21437 有实际字形）。相对上一版新增 26 个符号
  *          （含 U+2192 '→'，此前在配网引导屏渲染为方框），未移除任何原有码点。
  ******************************************************************************/
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
 #else
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #endif
 
 #ifndef LV_FONT_AI_PASSPORT_14
@@ -128428,8 +128431,8 @@ lv_font_t lv_font_ai_passport_14 = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
-    .line_height = 27,          /*The maximum line height required by the font*/
-    .base_line = 8,             /*Baseline measured from the bottom of the line*/
+    .line_height = 17,          /*Match the existing 14 px product layout*/
+    .base_line = 4,             /*Baseline measured from the bottom of the line*/
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif
