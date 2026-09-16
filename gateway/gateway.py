@@ -67,6 +67,11 @@ EVENT_RING_MAX = 2000
 AUDIO_MAX_BYTES = 8 * 1024 * 1024     # /ask /asr 上传上限
 AUDIO_TTL_SEC = 300                   # TTS 结果保存期
 AUDIO_STORE_MAX = 20
+# 会话状态缓存必须有界：无上限时浏览过的每个会话 topic 都会永久驻留，
+# 且 snapshot 帧会把整段会话历史全量缓存下来，长期运行内存只增不减。
+CONV_STATE_MAX_TOPICS = 16            # conv_state 保留的会话 topic 上限（按 updatedAt LRU 淘汰）
+TEXT_CACHE_MAX_CHARS = 8000           # 单条历史文本缓存上限，超出截断。只影响 history 回看；
+                                      # /ask 的答案取自 events 环中的完整文本，不受此限。
 
 
 def validate_upstream_url(url, source="config"):
@@ -329,6 +334,19 @@ class Gateway:
                 out = [e for e in out if e.get("taskId") in (task_id, None)]
             return out, self.event_seq
 
+    def evict_conv_state(self):
+        """conv_state 按 updatedAt 做 LRU 淘汰（调用方需持锁）。
+        活跃会话每帧都刷新 updatedAt，不会被误淘汰；被淘汰的 topic 下次访问会重新订阅取回。"""
+        over = len(self.conv_state) - CONV_STATE_MAX_TOPICS
+        if over <= 0:
+            return
+        ranked = sorted(self.conv_state.items(),
+                        key=lambda kv: (kv[1].get("updatedAt") or kv[1].get("snapshotAt") or 0))
+        for topic, _st in ranked[:over]:
+            self.conv_state.pop(topic, None)
+            gw_log("conv_state LRU 淘汰 %s（余 %d/%d）"
+                   % (topic, len(self.conv_state), CONV_STATE_MAX_TOPICS))
+
     # -- 状态更新回调 --
     def update_tasks(self, result):
         with self.lock:
@@ -377,6 +395,7 @@ class Gateway:
                         "snapshotAt": now_ms(),
                     })
                     _cache_texts(st0, snap_texts)
+                    self.evict_conv_state()
                 self.append_event("phase", taskId=task_id, phase=ctl.get("phase"),
                                   title=(snap.get("meta") or {}).get("title"))
             elif kind == "deltas":
@@ -387,6 +406,7 @@ class Gateway:
                 if texts:
                     with self.lock:
                         _cache_texts(self.conv_state.setdefault(topic, {}), texts)
+                        self.evict_conv_state()
                 ops = []
                 _walk_ops(payload, ops)
                 for o in ops:
@@ -921,7 +941,8 @@ def _walk_assistant_text(obj, out):
 
 
 def _cache_texts(st, texts):
-    """会话历史输出缓存（调用方需持锁）：按 responseId 去重保留最长文本，上限 60 条。"""
+    """会话历史输出缓存（调用方需持锁）：按 responseId 去重保留最长文本，上限 60 条，
+    单条超过 TEXT_CACHE_MAX_CHARS 截断（历史回看用不到更长正文，却会长期占内存）。"""
     cache = st.setdefault("texts", {})
     for t in texts:
         txt = (t.get("text") or "").strip()
@@ -930,6 +951,9 @@ def _cache_texts(st, texts):
         rid = t.get("responseId") or "seq-%s" % t.get("createdAtSeq")
         prev = cache.get(rid)
         if prev is None or len(txt) >= len((prev.get("text") or "").strip()):
+            if len(txt) > TEXT_CACHE_MAX_CHARS:
+                t = dict(t)
+                t["text"] = txt[:TEXT_CACHE_MAX_CHARS] + "…（历史缓存已截断）"
             cache[rid] = t
     if len(cache) > 60:
         oldest = sorted(cache, key=lambda r: (cache[r].get("createdAtSeq") or 0))[:len(cache) - 60]
